@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     #third-party
     'south',
     #local
+    'accounts',
 )
 
 MIDDLEWARE_CLASSES = (
