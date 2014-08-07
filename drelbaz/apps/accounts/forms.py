@@ -5,6 +5,10 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils.translation import ugettext_lazy as _
 
+from accounts.models import (
+    Appointment,
+    DentistDetail
+)
 from drelbaz.libs.utils import get_or_none
 
 
@@ -46,3 +50,12 @@ class LoginForm(forms.Form):
             raise forms.ValidationError(_('Email and Password fields are required'))
 
         return self.cleaned_data
+
+
+class AppointmentForm(forms.ModelForm):
+    class Meta:
+        model = Appointment
+
+class DentistDetailForm(forms.ModelForm):
+    class Meta:
+        model = DentistDetail

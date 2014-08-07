@@ -32,10 +32,15 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     #third-party
+    'provider',
+    'provider.oauth2',
     'south',
+    'tastypie',
     #local
     'accounts',
+    'api',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -64,6 +69,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+SITE_ID = 1
+
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
 DATABASES = {
@@ -91,9 +98,17 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'drelbaz', 'static'),
 )
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'drelbaz', 'media')
+
+MEDIA_URL = '/media/'
+
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'drelbaz', 'templates'),
 )
+
+API_LIMIT_PER_PAGE = 0
+TASTYPIE_DEFAULT_FORMATS = ['json']
+
 
 try:
     from local_settings import *

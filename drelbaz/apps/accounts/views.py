@@ -30,8 +30,10 @@ class LoginView(SiteWideMixin, View):
             auth.login(request, user)
             return HttpResponseRedirect(destination)
         else:
-            return self.render_to_response(self.get_context_data(**{
-                'login_form': form
-            }), status=401)
+            response = self.render_to_response(self.get_context_data(**{
+                            'login_form': form
+                        }), status=401)
+            response['auth-response'] = 'authError'
+            return response
 
 login = LoginView.as_view()
