@@ -74,7 +74,7 @@ class DentistDetail(models.Model):
     map = models.URLField(null=True, blank=True)
 
     user = models.OneToOneField(User)
-    pub_date = models.DateTimeField(default=now)
+    pub_date = models.DateTimeField(default=now, **optional)
 
     def __unicode__(self):
         return u'%s' % (self.user,)

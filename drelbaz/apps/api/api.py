@@ -11,6 +11,7 @@ from tastypie.resources import (
     ALL, ALL_WITH_RELATIONS
 )
 from tastypie.utils import trailing_slash
+from tastypie.validation import FormValidation
 
 
 from .validation import ModelFormValidation
@@ -101,13 +102,13 @@ class DentistDetailResource(ModelResource):
     class Meta:
         queryset = DentistDetail.objects.all()
         resource_name = 'dentistdetail'
-        allowed_methods = ['get', 'post', 'patch',]
+        allowed_methods = ['get', 'post', 'patch', 'put',]
         authentication = OAuth20Authentication()
         authorization = DjangoAuthorization()
         filtering = {
             'user': ALL_WITH_RELATIONS,
         }
-        validation = ModelFormValidation(form_class=DentistDetailForm)
+        validation = FormValidation(form_class=DentistDetailForm)
 
 
 class AppointmentResource(ModelResource):
