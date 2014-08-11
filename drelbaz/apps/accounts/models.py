@@ -124,7 +124,7 @@ class Appointment(models.Model):
 
             # Send a notification
             token_hex = self.dentist.dentistdetail.device_token
-            payload = Payload(alert="Hello World!", sound="default", badge=1)
+            alert_message = self.name + ' requested for an appointment.'
+            payload = Payload(alert=alert_message, sound="default", badge=1)
             apns.gateway_server.send_notification(token_hex, payload)
-            #send_push(self.dentist.dentistdetail.device_token, json.dumps(PAYLOAD))
 
