@@ -112,7 +112,7 @@ class Appointment(models.Model):
     def save(self, *args, **kwargs):
         super(Appointment, self).save(*args, **kwargs)
         if self.dentist.dentistdetail.device_token:
-            apns = APNs(use_sandbox=True, cert_file='PushNotifsCert.pem', key_file='NewPushNotifsKey.pem')
+            apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
             # Send a notification
             token_hex = self.dentist.dentistdetail.device_token
