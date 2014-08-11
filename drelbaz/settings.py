@@ -109,7 +109,8 @@ TEMPLATE_DIRS = (
 API_LIMIT_PER_PAGE = 0
 TASTYPIE_DEFAULT_FORMATS = ['json']
 
-APN_CERT_LOCATION = os.path.join(BASE_DIR, 'drelbaz/certs/de.pem')
+APN_CERT_LOCATION = os.path.join(BASE_DIR, 'drelbaz/certs/PushNotifsCert.pem')
+APN_KEY_LOCATION = os.path.join(BASE_DIR, 'drelbaz/certs/NewPushNotifsKey.pem')
 
 
 try:

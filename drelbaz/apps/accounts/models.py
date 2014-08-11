@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 from cStringIO import StringIO
 
@@ -7,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 
+from apns import APNs, Frame, Payload
 from PIL import Image
 from tastypie.utils.timezone import now
 
@@ -110,12 +112,11 @@ class Appointment(models.Model):
     def save(self, *args, **kwargs):
         super(Appointment, self).save(*args, **kwargs)
         if self.dentist.dentistdetail.device_token:
-            PAYLOAD = {
-                'aps': {
-                    'alert': self.name + ' requested an appointment.',
-                    'sound': 'default',
-                    'badge': 1,
-                }
-            }
-            send_push(self.dentist.dentistdetail.device_token, json.dumps(PAYLOAD))
+            apns = APNs(use_sandbox=True, cert_file='PushNotifsCert.pem', key_file='NewPushNotifsKey.pem')
+
+            # Send a notification
+            token_hex = self.dentist.dentistdetail.device_token
+            payload = Payload(alert="Hello World!", sound="default", badge=1)
+            apns.gateway_server.send_notification(token_hex, payload)
+            #send_push(self.dentist.dentistdetail.device_token, json.dumps(PAYLOAD))
 
