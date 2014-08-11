@@ -91,7 +91,7 @@ class DeviceTokenResource(ModelResource):
         allowed_methods = ['get', 'post',]
         #authentication = OAuth20Authentication()
         #authorization = DjangoAuthorization()
-        validation = FormValidation(form_class=DeviceToken)
+        validation = FormValidation(form_class=DeviceTokenForm)
 
 
 class PhotoResource(ModelResource):
