@@ -91,6 +91,7 @@ class Appointment(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(**optional)
     contact_number = models.CharField(max_length=25)
+    device_token = models.CharField(max_length=150)
     message = models.TextField()
 
     #dentist fields
