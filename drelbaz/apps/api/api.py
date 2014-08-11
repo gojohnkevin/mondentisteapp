@@ -90,7 +90,7 @@ class DeviceTokenResource(ModelResource):
         resource_name = 'devicetoken'
         allowed_methods = ['get', 'post',]
         #authentication = OAuth20Authentication()
-        #authorization = DjangoAuthorization()
+        authorization = DjangoAuthorization()
         validation = FormValidation(form_class=DeviceTokenForm)
 
 
