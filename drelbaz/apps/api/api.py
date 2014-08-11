@@ -16,6 +16,7 @@ from tastypie.validation import FormValidation
 
 from .validation import ModelFormValidation
 from accounts.models import (
+    DeviceToken,
     Photo,
     DentistDetail,
     Appointment
@@ -80,6 +81,15 @@ class UserResource(ModelResource):
             return self.create_response(request, { 'success': True })
         else:
             return self.create_response(request, { 'success': False }, HttpUnauthorized)
+
+
+class DeviceTokenResource(ModelResource):
+    class Meta:
+        queryset = DeviceToken.objects.all()
+        resource_name = 'devicetoken'
+        allowed_methods = ['get', 'post',]
+        #authentication = OAuth20Authentication()
+        #authorization = DjangoAuthorization()
 
 
 class PhotoResource(ModelResource):

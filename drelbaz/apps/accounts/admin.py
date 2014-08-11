@@ -5,6 +5,7 @@ from django.contrib.sites.models import Site
 from provider.oauth2.models import Client
 
 from accounts.models import (
+    DeviceToken,
     Photo,
     DentistDetail,
     Appointment,
@@ -34,6 +35,7 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+admin.site.register(DeviceToken)
 admin.site.register(Photo)
 admin.site.register(DentistDetail)
 admin.site.register(Appointment)

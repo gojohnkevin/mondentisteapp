@@ -26,6 +26,13 @@ optional = {
     'blank': True,
 }
 
+class DeviceToken(models.Model):
+    token = models.CharField(max_length=150, unique=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.token,)
+
+
 class Photo(models.Model):
     title = models.CharField(max_length=100)
     image = models.ImageField(upload_to=get_photo_upload_path)
