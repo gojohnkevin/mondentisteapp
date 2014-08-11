@@ -6,6 +6,7 @@ from django.core.validators import validate_email
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import (
+    DeviceToken,
     Appointment,
     DentistDetail
 )
@@ -59,3 +60,7 @@ class AppointmentForm(forms.ModelForm):
 class DentistDetailForm(forms.ModelForm):
     class Meta:
         model = DentistDetail
+
+class DeviceTokenForm(forms.ModelForm):
+    class Meta:
+        model = DeviceToken

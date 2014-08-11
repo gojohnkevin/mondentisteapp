@@ -23,7 +23,8 @@ from accounts.models import (
 )
 from accounts.forms import (
     AppointmentForm,
-    DentistDetailForm
+    DentistDetailForm,
+    DeviceTokenForm,
 )
 
 
@@ -88,8 +89,9 @@ class DeviceTokenResource(ModelResource):
         queryset = DeviceToken.objects.all()
         resource_name = 'devicetoken'
         allowed_methods = ['get', 'post',]
-        #authentication = OAuth20Authentication()
-        #authorization = DjangoAuthorization()
+        authentication = OAuth20Authentication()
+        authorization = DjangoAuthorization()
+        validation = FormValidation(form_class=DeviceToken)
 
 
 class PhotoResource(ModelResource):
