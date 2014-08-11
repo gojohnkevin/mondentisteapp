@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 
-from apns import APNs, Frame, Payload
+from apns import APNs, Payload
 from PIL import Image
 from tastypie.utils.timezone import now
 
