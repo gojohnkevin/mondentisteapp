@@ -117,5 +117,5 @@ class Appointment(models.Model):
                     'badge': 1,
                 }
             }
-            send_push(self.device_token, json.dumps(PAYLOAD))
+            send_push(self.dentist.dentistdetail.device_token, json.dumps(PAYLOAD))
 
