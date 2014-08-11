@@ -1,3 +1,4 @@
+import json
 import os
 
 from cStringIO import StringIO
@@ -8,6 +9,8 @@ from django.db import models
 
 from PIL import Image
 from tastypie.utils.timezone import now
+
+from drelbaz.libs.apns import send_push
 
 
 def get_photo_upload_path(instance, filename):
@@ -103,3 +106,16 @@ class Appointment(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.name,)
+
+    def save(self, *args, **kwargs):
+        super(Appointment, self).save(*args, **kwargs)
+        if self.dentist.dentistdetail.device_token:
+            PAYLOAD = {
+                'aps': {
+                    'alert': self.name + ' requested an appointment.',
+                    'sound': 'default',
+                    'badge': 1,
+                }
+            }
+            send_push(device_token, PAYLOAD)
+

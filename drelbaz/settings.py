@@ -109,6 +109,8 @@ TEMPLATE_DIRS = (
 API_LIMIT_PER_PAGE = 0
 TASTYPIE_DEFAULT_FORMATS = ['json']
 
+APN_CERT_LOCATION = os.path.join(BASE_DIR, 'drelbaz/certs/de.pem')
+
 
 try:
     from local_settings import *
