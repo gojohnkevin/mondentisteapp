@@ -86,6 +86,8 @@ class DentistDetail(models.Model):
 
     map = models.URLField(null=True, blank=True)
 
+    about = models.TextField(**optional)
+
     device_token = models.CharField(max_length=150, **optional)
 
     user = models.OneToOneField(User)
