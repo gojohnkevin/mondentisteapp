@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 
-from apns import APNs, Payload
+from apns import APNs, Frame, Payload
 from PIL import Image
 from tastypie.utils.timezone import now
 
@@ -110,6 +110,25 @@ class EmergencySchedule(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.dentist,)
+
+    def save(self, *args, **kwargs):
+        super(EmergencySchedule, self).save(*args, **kwargs)
+        if not self.is_booked:
+            if self.dentist.dentistdetail.device_token:
+                apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
+
+                # Send a notification
+                token_hex = self.dentist.dentistdetail.device_token
+                alert_message = 'New appointment schedule for Dr. Elbaz is available  at %s.' + (self.schedule.strftime('%b %d,%Y - %I:%M %p'),)
+                payload = Payload(alert=alert_message, sound="default", badge=1)
+
+                frame = Frame()
+                identifier = 1
+                expiry = time.time()+3600
+                priority = 10
+                for device_token in DeviceToken.objects.all():
+                    frame.add_item(device_token.token, payload, identifier, expiry, priority)
+                apns.gateway_server.send_notification_multiple(frame)
 
 
 class Appointment(models.Model):

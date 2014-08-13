@@ -2,7 +2,7 @@ Django==1.6.5
 Pillow==2.5.1
 PyYAML==3.11
 South==1.0
-apns==1.1.2
+-e git+https://github.com/djacobs/PyAPNs.git@e2666a52b6bde42bb149ef944017edf49927a032#egg=apns-dev
 defusedxml==0.4.1
 dj-database-url==0.3.0
 dj-static==0.0.5

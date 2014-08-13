@@ -9,6 +9,7 @@ from accounts.models import (
     Photo,
     DentistDetail,
     Appointment,
+    EmergencySchedule,
 )
 
 
@@ -43,3 +44,4 @@ admin.site.register(DeviceToken)
 admin.site.register(Photo)
 admin.site.register(DentistDetail)
 admin.site.register(Appointment, AppointmentAdmin)
+admin.site.register(EmergencySchedule)
