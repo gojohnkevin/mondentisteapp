@@ -105,6 +105,9 @@ class EmergencySchedule(models.Model):
 
     appointment = models.OneToOneField('accounts.Appointment', **optional)
 
+    class Meta:
+        ordering = ('-created',)
+
     def __unicode__(self):
         return u'%s' % (self.dentist,)
 
@@ -129,6 +132,9 @@ class Appointment(models.Model):
     schedule = models.DateTimeField(**optional)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
+    class Meta:
+        ordering = ('-created',)
+
     def __unicode__(self):
         return u'%s' % (self.name,)
 
@@ -152,7 +158,7 @@ class Appointment(models.Model):
                 if self.status == 'declined':
                     alert_message = 'Your appointment request has been declined. Please contact us for further details.'
                 elif self.status == 'accepted':
-                    alert_message = 'Your appointment request has been accepted. Please visit us on %s.' % (self.schedule,)
+                    alert_message = 'Your appointment request has been accepted. Please visit us on %s.' % (self.schedule.strftime('%b %d,%Y - %I:%M %p'),)
                 payload = Payload(alert=alert_message, sound="default", badge=1)
                 apns.gateway_server.send_notification(token_hex, payload)
 
