@@ -19,7 +19,8 @@ from accounts.models import (
     DeviceToken,
     Photo,
     DentistDetail,
-    Appointment
+    Appointment,
+    EmergencySchedule,
 )
 from accounts.forms import (
     AppointmentForm,
@@ -128,8 +129,17 @@ class AppointmentResource(ModelResource):
 
     class Meta:
         queryset = Appointment.objects.all()
-        resources = 'appointment'
+        resource_name = 'appointment'
         allowed_methods = ['get', 'post',]
         authentication = OAuth20Authentication()
         authorization = DjangoAuthorization()
         validation = ModelFormValidation(form_class=AppointmentForm)
+
+class EmergencyScheduleResource(ModelResource):
+    dentist = fields.ForeignKey(UserResource, 'dentist')
+    appointment = fields.ForeignKey(AppointmentResource, 'appointment')
+
+    class Meta:
+        queryset = EmergencySchedule.objects.all()
+        resource_name = 'emergencyschedule'
+        allowed_methods = ['get', 'post',]

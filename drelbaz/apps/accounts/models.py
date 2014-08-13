@@ -97,6 +97,18 @@ class DentistDetail(models.Model):
         return u'%s' % (self.user,)
 
 
+class EmergencySchedule(models.Model):
+    dentist = models.ForeignKey(User)
+    schedule = models.DateTimeField(**optional)
+    is_booked = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+
+    appointment = models.OneToOneField('accounts.Appointment', **optional)
+
+    def __unicode__(self):
+        return u'%s' % (self.dentist,)
+
+
 class Appointment(models.Model):
     STATUS_CHOICES = (
         ('pending', 'pending'),
@@ -110,6 +122,7 @@ class Appointment(models.Model):
     contact_number = models.CharField(max_length=25)
     device_token = models.CharField(max_length=150)
     message = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
 
     #dentist fields
     dentist = models.ForeignKey(User)
