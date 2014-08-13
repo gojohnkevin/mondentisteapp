@@ -111,10 +111,10 @@ class EmergencySchedule(models.Model):
 
 class Appointment(models.Model):
     STATUS_CHOICES = (
-        ('pending', 'pending'),
-        ('declined', 'declined'),
-        ('accepted', 'accepted'),
-        ('canceled', 'canceled'),
+        ('pending', 'Pending'),
+        ('declined', 'Declined'),
+        ('accepted', 'Accepted'),
+        ('canceled', 'Canceled'),
     )
     #user fields
     name = models.CharField(max_length=100)
@@ -134,12 +134,25 @@ class Appointment(models.Model):
 
     def save(self, *args, **kwargs):
         super(Appointment, self).save(*args, **kwargs)
-        if self.dentist.dentistdetail.device_token:
-            apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
+        if not self.schedule:
+            if self.dentist.dentistdetail.device_token:
+                apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
-            # Send a notification
-            token_hex = self.dentist.dentistdetail.device_token
-            alert_message = self.name + ' requested for an appointment.'
-            payload = Payload(alert=alert_message, sound="default", badge=1)
-            apns.gateway_server.send_notification(token_hex, payload)
+                # Send a notification
+                token_hex = self.dentist.dentistdetail.device_token
+                alert_message = self.name + ' requested for an appointment.'
+                payload = Payload(alert=alert_message, sound="default", badge=1)
+                apns.gateway_server.send_notification(token_hex, payload)
+        else:
+            if self.device_token:
+                apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
+
+                # Send a notification
+                token_hex = self.device_token
+                if self.status == 'declined':
+                    alert_message = 'Your appointment request has been declined. Please contact us for further details.'
+                elif self.status == 'accepted':
+                    alert_message = 'Your appointment request has been accepted. Please visit us on %s.' % (self.schedule,)
+                payload = Payload(alert=alert_message, sound="default", badge=1)
+                apns.gateway_server.send_notification(token_hex, payload)
 

@@ -33,9 +33,13 @@ class UserAdmin(admin.ModelAdmin):
 
     generate_api_key.short_description = "Generate API Key"
 
+
+class AppointmentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'dentist', 'status')
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(DeviceToken)
 admin.site.register(Photo)
 admin.site.register(DentistDetail)
-admin.site.register(Appointment)
+admin.site.register(Appointment, AppointmentAdmin)
