@@ -79,12 +79,12 @@ class Photo(models.Model):
 class DentistDetail(models.Model):
     contact_number = models.CharField(max_length=20)
     email = models.EmailField()
-    website = models.URLField(null=True, blank=True)
+    website = models.URLField()
 
-    facebook = models.CharField(max_length=150, null=True, blank=True)
-    twitter = models.CharField(max_length=150, null=True, blank=True)
+    facebook = models.CharField(max_length=150, **optional)
+    twitter = models.CharField(max_length=150, **optional)
 
-    map = models.URLField(null=True, blank=True)
+    map = models.URLField(**optional)
 
     about = models.TextField(**optional)
 
