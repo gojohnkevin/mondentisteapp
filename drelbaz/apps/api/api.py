@@ -140,6 +140,7 @@ class AppointmentResource(ModelResource):
         authorization = DjangoAuthorization()
         validation = ModelFormValidation(form_class=AppointmentForm)
 
+
 class EmergencyScheduleResource(ModelResource):
     dentist = fields.ForeignKey(UserResource, 'dentist')
     appointment = fields.ForeignKey(AppointmentResource, 'appointment', **optional)
@@ -152,4 +153,5 @@ class EmergencyScheduleResource(ModelResource):
         #authorization = DjangoAuthorization()
         filtering = {
             'dentist': ALL_WITH_RELATIONS,
+            'is_booked': ['exact'],
         }
