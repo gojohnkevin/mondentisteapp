@@ -28,6 +28,11 @@ from accounts.forms import (
     DeviceTokenForm,
 )
 
+optional = {
+    'null' : True,
+    'blank': True,
+}
+
 
 class UserResource(ModelResource):
     class Meta:
@@ -137,7 +142,7 @@ class AppointmentResource(ModelResource):
 
 class EmergencyScheduleResource(ModelResource):
     dentist = fields.ForeignKey(UserResource, 'dentist')
-    appointment = fields.ForeignKey(AppointmentResource, 'appointment')
+    appointment = fields.ForeignKey(AppointmentResource, 'appointment', **optional)
 
     class Meta:
         queryset = EmergencySchedule.objects.all()
