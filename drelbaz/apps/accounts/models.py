@@ -97,6 +97,15 @@ class DentistDetail(models.Model):
         return u'%s' % (self.user,)
 
 
+class Notification(models.Model):
+    device_token = models.CharField(max_length=150, **optional)
+    message = models.CharField(max_length=150)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.device_token,)
+
+
 class EmergencySchedule(models.Model):
     dentist = models.ForeignKey(User)
     schedule = models.DateTimeField(**optional)
