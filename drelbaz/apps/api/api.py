@@ -148,7 +148,7 @@ class EmergencyScheduleResource(ModelResource):
     class Meta:
         queryset = EmergencySchedule.objects.all()
         resource_name = 'emergencyschedule'
-        allowed_methods = ['get', 'post',]
+        allowed_methods = ['get', 'post', 'patch',]
         #authentication = OAuth20Authentication()
         #authorization = DjangoAuthorization()
         filtering = {
