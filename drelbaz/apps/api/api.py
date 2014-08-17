@@ -149,8 +149,8 @@ class EmergencyScheduleResource(ModelResource):
         queryset = EmergencySchedule.objects.all()
         resource_name = 'emergencyschedule'
         allowed_methods = ['get', 'post', 'patch',]
-        #authentication = OAuth20Authentication()
-        #authorization = DjangoAuthorization()
+        authentication = OAuth20Authentication()
+        authorization = DjangoAuthorization()
         filtering = {
             'dentist': ALL_WITH_RELATIONS,
             'is_booked': ['exact'],
