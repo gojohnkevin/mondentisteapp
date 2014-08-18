@@ -137,6 +137,8 @@ class EmergencySchedule(models.Model):
                 priority = 10
                 for device_token in DeviceToken.objects.all():
                     frame.add_item(device_token.token, payload, identifier, expiry, priority)
+                    notification = Notification(message=alert_message, device_token=device_token.token)
+                    notification.save()
                 apns.gateway_server.send_notification_multiple(frame)
 
 
@@ -175,6 +177,8 @@ class Appointment(models.Model):
                 # Send a notification
                 token_hex = self.dentist.dentistdetail.device_token
                 alert_message = self.name + ' requested for an appointment.'
+                notification = Notification(message=alert_message, device_token=token_hex)
+                notification.save()
                 payload = Payload(alert=alert_message, sound="default", badge=1)
                 apns.gateway_server.send_notification(token_hex, payload)
         else:
@@ -188,5 +192,7 @@ class Appointment(models.Model):
                 elif self.status == 'accepted':
                     alert_message = 'Your appointment request has been accepted. Please visit us on %s.' % (self.schedule.strftime('%b %d,%Y - %I:%M %p'),)
                 payload = Payload(alert=alert_message, sound="default", badge=1)
+                notification = Notification(message=alert_message, device_token=token_hex)
+                notification.save()
                 apns.gateway_server.send_notification(token_hex, payload)
 
