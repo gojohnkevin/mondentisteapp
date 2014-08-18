@@ -115,8 +115,6 @@ class EmergencySchedule(models.Model):
     is_booked = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
 
-    appointment = models.OneToOneField('accounts.Appointment', **optional)
-
     class Meta:
         ordering = ('-created',)
 

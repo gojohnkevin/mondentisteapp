@@ -156,7 +156,6 @@ class AppointmentResource(ModelResource):
 
 class EmergencyScheduleResource(ModelResource):
     dentist = fields.ForeignKey(UserResource, 'dentist')
-    appointment = fields.ForeignKey(AppointmentResource, 'appointment', **optional)
 
     class Meta:
         queryset = EmergencySchedule.objects.all()
