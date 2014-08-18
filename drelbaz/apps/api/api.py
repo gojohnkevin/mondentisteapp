@@ -21,6 +21,7 @@ from accounts.models import (
     DentistDetail,
     Appointment,
     EmergencySchedule,
+    Notification,
 )
 from accounts.forms import (
     AppointmentForm,
@@ -98,6 +99,18 @@ class DeviceTokenResource(ModelResource):
         authentication = OAuth20Authentication()
         authorization = DjangoAuthorization()
         validation = FormValidation(form_class=DeviceTokenForm)
+
+
+class NotificationResource(ModelResource):
+    class Meta:
+        queryset = Notification.objects.all()
+        resource_name = 'notification'
+        allowed_methods = ['get', 'post',]
+        authentication = OAuth20Authentication()
+        authorization = DjangoAuthorization()
+        filtering = {
+            'device_token': ['exact',]
+        }
 
 
 class PhotoResource(ModelResource):
