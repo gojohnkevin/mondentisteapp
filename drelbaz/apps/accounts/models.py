@@ -102,6 +102,9 @@ class Notification(models.Model):
     message = models.CharField(max_length=150)
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ('-created',)
+
     def __unicode__(self):
         return u'%s' % (self.device_token,)
 
