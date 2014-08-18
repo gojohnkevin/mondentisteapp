@@ -151,6 +151,9 @@ class AppointmentResource(ModelResource):
         allowed_methods = ['get', 'post',]
         authentication = OAuth20Authentication()
         authorization = DjangoAuthorization()
+        filtering = {
+            'device_token': ['exact',],
+        }
         validation = ModelFormValidation(form_class=AppointmentForm)
 
 
