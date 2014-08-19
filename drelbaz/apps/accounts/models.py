@@ -125,7 +125,7 @@ class EmergencySchedule(models.Model):
         super(EmergencySchedule, self).save(*args, **kwargs)
         if not self.is_booked:
             if self.dentist.dentistdetail.device_token:
-                apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
+                apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
                 token_hex = self.dentist.dentistdetail.device_token
@@ -173,7 +173,7 @@ class Appointment(models.Model):
         super(Appointment, self).save(*args, **kwargs)
         if not self.schedule:
             if self.dentist.dentistdetail.device_token:
-                apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
+                apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
                 token_hex = self.dentist.dentistdetail.device_token
@@ -184,7 +184,7 @@ class Appointment(models.Model):
                 apns.gateway_server.send_notification(token_hex, payload)
         else:
             if self.device_token:
-                apns = APNs(use_sandbox=True, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
+                apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
                 token_hex = self.device_token
