@@ -17,9 +17,21 @@ from accounts.models import (
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'dentist', 'status')
 
+class PhotoAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'user':
+            kwargs['initial'] = request.user.id
+        return super(PhotoAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
+
+    def queryset(self, request):
+        qs = super(PhotoAdmin, self).queryset(request)
+        return qs.filter(user=request.user)
+
 
 admin.site.register(DeviceToken)
-admin.site.register(Photo)
+admin.site.register(Photo, PhotoAdmin)
 admin.site.register(DentistDetail)
 admin.site.register(Appointment, AppointmentAdmin)
 admin.site.register(EmergencySchedule)
