@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import os
 import time
@@ -150,17 +152,31 @@ class Appointment(models.Model):
         ('accepted', 'Accepted'),
         ('canceled', 'Canceled'),
     )
+
+    PURPOSE_CHOICES = (
+        (u'Consultation dentaire', 'Consultation dentaire'),
+        (u'Bilan complet', 'Bilan complet'),
+        (u'Détartrage', 'Détartrage'),
+        (u'Urgence dentaire', 'Urgence dentaire'),
+        (u'Blanchiment', 'Blanchiment'),
+        (u'Devis prothèse', 'Devis prothèse'),
+        (u'Devis implants', 'Devis implants'),
+        (u'Autres', 'Autres'),
+    )
+
     #user fields
     name = models.CharField(max_length=100)
     email = models.EmailField(**optional)
     contact_number = models.CharField(max_length=25)
-    device_token = models.CharField(max_length=150)
-    message = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
+    purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
+    comment = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
+    device_token = models.CharField(max_length=150)
 
     #dentist fields
     dentist = models.ForeignKey(User)
-    schedule = models.DateTimeField(**optional)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     class Meta:
@@ -171,13 +187,13 @@ class Appointment(models.Model):
 
     def save(self, *args, **kwargs):
         super(Appointment, self).save(*args, **kwargs)
-        if not self.schedule:
+        if self.status == 'pending':
             if self.dentist.dentistdetail.device_token:
                 apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
                 token_hex = self.dentist.dentistdetail.device_token
-                alert_message = self.name + ' requested for an appointment.'
+                alert_message = self.name + ' requested for an appointment on %s - %s.'  % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
                 notification = Notification(message=alert_message, device_token=token_hex)
                 notification.save()
                 payload = Payload(alert=alert_message, sound="default", badge=1)
