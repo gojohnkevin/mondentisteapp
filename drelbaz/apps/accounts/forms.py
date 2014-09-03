@@ -54,7 +54,8 @@ class LoginForm(forms.Form):
 
 
 class AppointmentForm(forms.ModelForm):
-    schedule = forms.DateTimeField(input_formats=['%Y-%m-%dT%H:%M:%S',], required=False)
+    date = forms.DateField(input_formats=['%Y-%m-%d',])
+    time = forms.TimeField(input_formats=['%H:%M',])
     class Meta:
         model = Appointment
 

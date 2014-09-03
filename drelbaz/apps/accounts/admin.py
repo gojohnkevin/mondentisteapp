@@ -11,6 +11,7 @@ from accounts.models import (
     Appointment,
     EmergencySchedule,
     Notification,
+    Book,
 )
 
 
@@ -36,3 +37,4 @@ admin.site.register(DentistDetail)
 admin.site.register(Appointment, AppointmentAdmin)
 admin.site.register(EmergencySchedule)
 admin.site.register(Notification)
+admin.site.register(Book)

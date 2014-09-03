@@ -22,6 +22,7 @@ from accounts.models import (
     Appointment,
     EmergencySchedule,
     Notification,
+    Book,
 )
 from accounts.forms import (
     AppointmentForm,
@@ -110,6 +111,18 @@ class NotificationResource(ModelResource):
         authorization = DjangoAuthorization()
         filtering = {
             'device_token': ['exact',]
+        }
+
+
+class BookResource(ModelResource):
+    class Meta:
+        queryset = Book.objects.all()
+        resource_name = 'book'
+        allowed_methods = ['get', 'post',]
+        authentication = OAuth20Authentication()
+        authorization = DjangoAuthorization()
+        filtering = {
+            'dentist': ALL_WITH_RELATIONS,
         }
 
 

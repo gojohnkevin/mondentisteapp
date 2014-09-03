@@ -22,6 +22,8 @@ def get_photo_upload_path(instance, filename):
     return os.path.join('photos', 'user_%d' % instance.user.id, filename)
 def get_thumbnail_upload_path(instance, filename):
     return os.path.join('thumbnails', 'user_%d' % instance.user.id, filename)
+def get_book_photo_upload_path(instance, filename):
+    return os.path.join('books', 'user_%d' % instance.dentist.id, filename)
 
 optional = {
     'null' : True,
@@ -78,6 +80,19 @@ class Photo(models.Model):
         super(Photo, self).save(force_update, force_insert)
 
 
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField(**optional)
+    image = models.ImageField(upload_to=get_book_photo_upload_path, **optional)
+    url = models.URLField()
+
+    dentist = models.ForeignKey(User)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.title,)
+
+
 class DentistDetail(models.Model):
     contact_number = models.CharField(max_length=20)
     email = models.EmailField()
@@ -89,6 +104,7 @@ class DentistDetail(models.Model):
     map = models.URLField(**optional)
 
     about = models.TextField(**optional)
+    patient_education = models.TextField(**optional)
 
     device_token = models.CharField(max_length=150, **optional)
 
@@ -171,7 +187,7 @@ class Appointment(models.Model):
     date = models.DateField()
     time = models.TimeField()
     purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
-    comment = models.TextField()
+    comment = models.TextField(**optional)
     created = models.DateTimeField(auto_now_add=True)
     device_token = models.CharField(max_length=150)
 
