@@ -24,6 +24,8 @@ def get_thumbnail_upload_path(instance, filename):
     return os.path.join('thumbnails', 'user_%d' % instance.user.id, filename)
 def get_book_photo_upload_path(instance, filename):
     return os.path.join('books', 'user_%d' % instance.dentist.id, filename)
+def get_note_photo_upload_path(instance, filename):
+    return os.path.join('notes', '%s' % instance.device_token, filename)
 
 optional = {
     'null' : True,
@@ -127,6 +129,15 @@ class Notification(models.Model):
         return u'%s' % (self.device_token,)
 
 
+class Note(models.Model):
+    image = models.ImageField(upload_to=get_note_photo_upload_path)
+    comment = models.TextField(**optional)
+    device_token = models.CharField(max_length=150, **optional)
+
+    def __unicode__(self):
+        return u'%s' % (self.device_token,)
+
+
 class EmergencySchedule(models.Model):
     dentist = models.ForeignKey(User)
     date = models.DateField()
@@ -136,6 +147,7 @@ class EmergencySchedule(models.Model):
 
     class Meta:
         ordering = ('-created',)
+        unique_together = ('dentist', 'date', 'time',)
 
     def __unicode__(self):
         return u'%s' % (self.dentist,)

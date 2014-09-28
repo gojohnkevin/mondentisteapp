@@ -31,10 +31,14 @@ class PhotoAdmin(admin.ModelAdmin):
         return qs.filter(user=request.user)
 
 
+class EmergencyScheduleAdmin(admin.ModelAdmin):
+    list_display = ('dentist', 'date', 'time',)
+
+
 admin.site.register(DeviceToken)
 admin.site.register(Photo, PhotoAdmin)
 admin.site.register(DentistDetail)
 admin.site.register(Appointment, AppointmentAdmin)
-admin.site.register(EmergencySchedule)
+admin.site.register(EmergencySchedule, EmergencyScheduleAdmin)
 admin.site.register(Notification)
 admin.site.register(Book)

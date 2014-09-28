@@ -1,6 +1,7 @@
 from django.forms.models import ModelChoiceField
 
 from tastypie.validation import FormValidation
+from tastypie.resources import ModelResource
 
 
 class ModelFormValidation(FormValidation):
@@ -9,43 +10,20 @@ class ModelFormValidation(FormValidation):
     about URI to PK conversion for ``ToOneField`` or ``ToManyField``.
     """
 
-    def uri_to_pk(self, uri):
-        """
-        Returns the integer PK part of a URI.
+    resource = ModelResource
 
-        Assumes ``/api/v1/resource/123/`` format. If conversion fails, this just
-        returns the URI unmodified.
+    def __init__(self, **kwargs):
+        if not 'resource' in kwargs:
+            raise ImproperlyConfigured("You must provide a 'resource' to 'ModelFormValidation' classes.")
 
-        Also handles lists of URIs
-        """
+        self.resource = kwargs.pop('resource')
 
-        if uri is None:
-            return None
+        super(ModelFormValidation, self).__init__(**kwargs)
 
-        # convert everything to lists
-        multiple = not isinstance(uri, basestring)
-        uris = uri if multiple else [uri]
+    def form_args(self, bundle):
+        rsc = self.resource()
 
-        # handle all passed URIs
-        converted = []
-        for one_uri in uris:
-            try:
-                # hopefully /api/v1/<resource_name>/<pk>/
-                converted.append(int(one_uri.split('/')[-2]))
-            except (IndexError, ValueError):
-                raise ValueError(
-                    "URI %s could not be converted to PK integer." % one_uri)
-
-        # convert back to original format
-        return converted if multiple else converted[0]
-
-    def is_valid(self, bundle, request=None):
-        data = bundle.data
-        # Ensure we get a bound Form, regardless of the state of the bundle.
-        if data is None:
-            data = {}
-        # copy data, so we don't modify the bundle
-        data = data.copy()
+        kwargs = super(ModelFormValidation, self).form_args(bundle)
 
         # convert URIs to PK integers for all relation fields
         relation_fields = [name for name, field in
@@ -53,11 +31,8 @@ class ModelFormValidation(FormValidation):
                            if issubclass(field.__class__, ModelChoiceField)]
 
         for field in relation_fields:
-            if field in data:
-                data[field] = self.uri_to_pk(data[field])
+            if (field in kwargs['data']) and (field in rsc.fields) and (kwargs['data'][field] != None):
+                toRsc = rsc.fields[field].to()
+                kwargs['data'][field] = kwargs['data'][field].replace(toRsc.get_resource_uri(), "").replace("/", "")
 
-        # validate and return messages on error
-        form = self.form_class(data)
-        if form.is_valid():
-            return {}
-        return form.errors
+        return kwargs

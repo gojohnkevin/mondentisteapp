@@ -141,7 +141,7 @@ class PhotoResource(ModelResource):
 
 
 class DentistDetailResource(ModelResource):
-    user = fields.ForeignKey(UserResource, 'user')
+    user = fields.ToOneField(UserResource, 'user')
 
     class Meta:
         queryset = DentistDetail.objects.all()
@@ -152,7 +152,11 @@ class DentistDetailResource(ModelResource):
         filtering = {
             'user': ALL_WITH_RELATIONS,
         }
-        validation = FormValidation(form_class=DentistDetailForm)
+
+        @property
+        def validation(self):
+            return ModelFormValidation(form_class=DentistDetailForm, \
+                                            resource=DentistDetailResource)
 
 
 class AppointmentResource(ModelResource):
@@ -167,7 +171,11 @@ class AppointmentResource(ModelResource):
         filtering = {
             'device_token': ['exact',],
         }
-        validation = ModelFormValidation(form_class=AppointmentForm)
+
+        @property
+        def validation(self):
+            return ModelFormValidation(form_class=AppointmentForm, \
+                                            resource=AppointmentResource)
 
 
 class EmergencyScheduleResource(ModelResource):
