@@ -222,8 +222,6 @@ class EmergencyScheduleResource(ModelResource):
         week_schedule = OrderedDict()
         current_date = datetime.utcnow().date()
 
-        encoder = DjangoJSONEncoder()
-
         for daygap in range(6):
             date = current_date + timedelta(days=daygap)
             schedules = EmergencySchedule.objects.filter(date=date)
@@ -232,8 +230,7 @@ class EmergencyScheduleResource(ModelResource):
                 schedules = schedules.filter(is_booked=is_booked)
 
             if schedules.count():
-                # schedules_list = [json.loads(json.dumps(schedule, cls=DjangoJSONEncoder)) for schedule in schedules.values()]
-                schedules_list = [encoder.encode(schedule) for schedule in schedules.values()]
+                schedules_list = [json.loads(json.dumps(schedule, cls=DjangoJSONEncoder)) for schedule in schedules.values()]
 
                 week_schedule.update({date.strftime('%B %d, %Y'): schedules_list})
 
