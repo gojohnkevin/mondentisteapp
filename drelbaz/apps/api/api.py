@@ -1,6 +1,12 @@
+import json
+
+from collections import OrderedDict
+from datetime import datetime, timedelta
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.conf.urls import url
+from django.core.serializers.json import DjangoJSONEncoder
 
 from authentication import OAuth20Authentication
 from tastypie import fields
@@ -28,6 +34,7 @@ from accounts.forms import (
     AppointmentForm,
     DentistDetailForm,
     DeviceTokenForm,
+    EmergencyScheduleForm,
 )
 
 optional = {
@@ -191,3 +198,43 @@ class EmergencyScheduleResource(ModelResource):
             'dentist': ALL_WITH_RELATIONS,
             'is_booked': ['exact'],
         }
+
+        @property
+        def validation(self):
+            return ModelFormValidation(form_class=EmergencyScheduleForm, \
+                                            resource=EmergencyScheduleResource)
+
+    def prepend_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/weekly%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('weekly'), name="emergencyschedule_weekly"),
+        ]
+
+    def weekly(self, request, **kwargs):
+        self.method_check(request, allowed=['get'])
+        #self.is_authenticated(request)
+        self.throttle_check(request)
+
+        is_booked = request.GET.get('is_booked')
+        is_booked = None if is_booked is None else is_booked == 'True'
+
+        week_schedule = OrderedDict()
+        current_date = datetime.utcnow().date()
+
+        encoder = DjangoJSONEncoder()
+
+        for daygap in range(6):
+            date = current_date + timedelta(days=daygap)
+            schedules = EmergencySchedule.objects.filter(date=date)
+
+            if is_booked is not None:
+                schedules = schedules.filter(is_booked=is_booked)
+
+            if schedules.count():
+                # schedules_list = [json.loads(json.dumps(schedule, cls=DjangoJSONEncoder)) for schedule in schedules.values()]
+                schedules_list = [encoder.encode(schedule) for schedule in schedules.values()]
+
+                week_schedule.update({date.strftime('%B %d, %Y'): schedules_list})
+
+        return self.create_response(request, {'objects': week_schedule })

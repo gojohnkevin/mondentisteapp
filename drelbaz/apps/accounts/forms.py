@@ -8,7 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import (
     DeviceToken,
     Appointment,
-    DentistDetail
+    DentistDetail,
+    EmergencySchedule,
 )
 from drelbaz.libs.utils import get_or_none
 
@@ -66,3 +67,7 @@ class DentistDetailForm(forms.ModelForm):
 class DeviceTokenForm(forms.ModelForm):
     class Meta:
         model = DeviceToken
+
+class EmergencyScheduleForm(forms.ModelForm):
+    class Meta:
+        model = EmergencySchedule

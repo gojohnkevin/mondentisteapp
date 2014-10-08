@@ -146,11 +146,11 @@ class EmergencySchedule(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ('-created',)
+        ordering = ('-date', 'time',)
         unique_together = ('dentist', 'date', 'time',)
 
     def __unicode__(self):
-        return u'%s' % (self.dentist,)
+        return u'%s - %s %s' % (self.dentist, unicode(self.date), unicode(self.time))
 
     def save(self, *args, **kwargs):
         super(EmergencySchedule, self).save(*args, **kwargs)
