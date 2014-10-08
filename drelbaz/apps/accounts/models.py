@@ -160,7 +160,7 @@ class EmergencySchedule(models.Model):
 
                 # Send a notification
                 token_hex = self.dentist.dentistdetail.device_token
-                alert_message = 'New appointment schedule for Dr. Elbaz is available  at %s.' % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
+                alert_message = 'New appointment schedule for Dr. Elbaz is available  at %s - %s.' % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
                 payload = Payload(alert=alert_message, sound="default", badge=1)
 
                 frame = Frame()
