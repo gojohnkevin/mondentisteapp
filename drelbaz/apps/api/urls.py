@@ -5,22 +5,26 @@ from .api import (
     DeviceTokenResource,
     PhotoResource,
     UserResource,
-    DentistDetailResource,
+    DentistProfileResource,
     AppointmentResource,
     EmergencyScheduleResource,
     NotificationResource,
     BookResource,
+    UserCreateResource,
+    UserProfileResource,
 )
 
 v1_api = Api(api_name='v1')
 v1_api.register(UserResource())
 v1_api.register(DeviceTokenResource())
 v1_api.register(PhotoResource())
-v1_api.register(DentistDetailResource())
+v1_api.register(DentistProfileResource())
 v1_api.register(AppointmentResource())
 v1_api.register(EmergencyScheduleResource())
 v1_api.register(NotificationResource())
 v1_api.register(BookResource())
+v1_api.register(UserCreateResource())
+v1_api.register(UserProfileResource())
 
 urlpatterns = patterns('',
     (r'^', include(v1_api.urls)),

@@ -7,20 +7,25 @@ from provider.oauth2.models import Client
 from accounts.models import (
     DeviceToken,
     Photo,
-    DentistDetail,
+    DentistProfile,
     Appointment,
     EmergencySchedule,
     Notification,
     Book,
+    UserProfile,
 )
 
 
 class AppointmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'dentist', 'status')
+    list_display = ('get_patient', 'dentist', 'status')
+
+    def get_patient(self, obj):
+        return obj.patient.profile.name
+    get_patient.short_description = 'Patient'
 
 class PhotoAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'user':
+        if db_field.name == 'dentist':
             kwargs['initial'] = request.user.id
         return super(PhotoAdmin, self).formfield_for_foreignkey(
             db_field, request, **kwargs
@@ -28,7 +33,7 @@ class PhotoAdmin(admin.ModelAdmin):
 
     def queryset(self, request):
         qs = super(PhotoAdmin, self).queryset(request)
-        return qs.filter(user=request.user)
+        return qs.filter(dentist=request.user)
 
 
 class EmergencyScheduleAdmin(admin.ModelAdmin):
@@ -37,8 +42,9 @@ class EmergencyScheduleAdmin(admin.ModelAdmin):
 
 admin.site.register(DeviceToken)
 admin.site.register(Photo, PhotoAdmin)
-admin.site.register(DentistDetail)
+admin.site.register(DentistProfile)
 admin.site.register(Appointment, AppointmentAdmin)
 admin.site.register(EmergencySchedule, EmergencyScheduleAdmin)
 admin.site.register(Notification)
 admin.site.register(Book)
+admin.site.register(UserProfile)

@@ -33,7 +33,7 @@ optional = {
 }
 
 class DeviceToken(models.Model):
-    token = models.CharField(max_length=150, unique=True)
+    token = models.CharField(max_length=150, unique=True, **optional)
 
     def __unicode__(self):
         return u'%s' % (self.token,)
@@ -48,8 +48,8 @@ class Photo(models.Model):
     thumbnail_height = models.IntegerField(**optional)
     thumbnail_width = models.IntegerField(**optional)
 
-    user = models.ForeignKey(User)
-    pub_date = models.DateTimeField(default=now)
+    dentist = models.ForeignKey(User)
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return u'%s' % (self.title,)
@@ -95,7 +95,17 @@ class Book(models.Model):
         return u'%s' % (self.title,)
 
 
-class DentistDetail(models.Model):
+class UserProfile(models.Model):
+    name = models.CharField(max_length=100)
+    contact_number = models.CharField(max_length=20)
+    user = models.OneToOneField(User, related_name='profile')
+    device_token = models.ManyToManyField(DeviceToken, **optional)
+
+    def __unicode__(self):
+        return u'%s' % (self.name,)
+
+
+class DentistProfile(models.Model):
     contact_number = models.CharField(max_length=20)
     email = models.EmailField()
     website = models.URLField()
@@ -108,34 +118,34 @@ class DentistDetail(models.Model):
     about = models.TextField(**optional)
     patient_education = models.TextField(**optional)
 
-    device_token = models.CharField(max_length=150, **optional)
-
-    user = models.OneToOneField(User)
-    pub_date = models.DateTimeField(default=now, **optional)
+    dentist = models.OneToOneField(User)
+    device_token = models.ManyToManyField(DeviceToken, **optional)
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return u'%s' % (self.user,)
+        return u'%s' % (self.dentist.get_full_name(),)
 
 
 class Notification(models.Model):
-    device_token = models.CharField(max_length=150, **optional)
+    user = models.ForeignKey(User)
     message = models.CharField(max_length=150)
     created = models.DateTimeField(auto_now_add=True)
+    viewed = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('-created',)
 
     def __unicode__(self):
-        return u'%s' % (self.device_token,)
+        return u'%s - %s' % (self.user, self.message,)
 
 
 class Note(models.Model):
     image = models.ImageField(upload_to=get_note_photo_upload_path)
     comment = models.TextField(**optional)
-    device_token = models.CharField(max_length=150, **optional)
+    user = models.ForeignKey(User)
 
     def __unicode__(self):
-        return u'%s' % (self.device_token,)
+        return u'%s' % (self.user,)
 
 
 class EmergencySchedule(models.Model):
@@ -150,7 +160,7 @@ class EmergencySchedule(models.Model):
         unique_together = ('dentist', 'date', 'time',)
 
     def __unicode__(self):
-        return u'%s - %s %s' % (self.dentist, unicode(self.date), unicode(self.time))
+        return u'%s - %s %s' % (self.dentist.get_full_name(), unicode(self.date), unicode(self.time))
 
     def save(self, *args, **kwargs):
         super(EmergencySchedule, self).save(*args, **kwargs)
@@ -194,25 +204,21 @@ class Appointment(models.Model):
     )
 
     #user fields
-    name = models.CharField(max_length=100)
-    email = models.EmailField(**optional)
-    contact_number = models.CharField(max_length=25)
     date = models.DateField()
     time = models.TimeField()
     purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
     comment = models.TextField(**optional)
     created = models.DateTimeField(auto_now_add=True)
-    device_token = models.CharField(max_length=150)
 
-    #dentist fields
-    dentist = models.ForeignKey(User)
+    dentist = models.ForeignKey(User, related_name='dentist_apts')
+    patient = models.ForeignKey(User, related_name='patient_apts')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     class Meta:
         ordering = ('-created',)
 
     def __unicode__(self):
-        return u'%s' % (self.name,)
+        return u'%s' % (self.patient.profile.name,)
 
     def save(self, *args, **kwargs):
         super(Appointment, self).save(*args, **kwargs)
@@ -222,7 +228,7 @@ class Appointment(models.Model):
 
                 # Send a notification
                 token_hex = self.dentist.dentistdetail.device_token
-                alert_message = self.name + ' requested for an appointment on %s - %s.'  % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
+                alert_message = self.patient.profile.name + ' requested for an appointment on %s - %s.'  % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
                 notification = Notification(message=alert_message, device_token=token_hex)
                 notification.save()
                 payload = Payload(alert=alert_message, sound="default", badge=1)
@@ -242,3 +248,19 @@ class Appointment(models.Model):
                 notification.save()
                 apns.gateway_server.send_notification(token_hex, payload)
 
+
+#===========================================================================
+# SIGNALS
+#===========================================================================
+def signals_import():
+    """ A note on signals.
+
+    The signals need to be imported early on so that they get registered
+    by the application. Putting the signals here makes sure of this since
+    the models package gets imported on the application startup.
+    """
+    from accounts.utils import create_client
+
+    models.signals.post_save.connect(create_client, sender=User)
+
+signals_import()
