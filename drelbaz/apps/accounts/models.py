@@ -25,7 +25,7 @@ def get_thumbnail_upload_path(instance, filename):
 def get_book_photo_upload_path(instance, filename):
     return os.path.join('books', 'user_%d' % instance.dentist.id, filename)
 def get_note_photo_upload_path(instance, filename):
-    return os.path.join('notes', '%s' % instance.device_token, filename)
+    return os.path.join('notes', '%s' % instance.user.id, filename)
 
 optional = {
     'null' : True,
@@ -33,7 +33,7 @@ optional = {
 }
 
 class DeviceToken(models.Model):
-    token = models.CharField(max_length=150, unique=True, **optional)
+    token = models.CharField(max_length=150, **optional)
 
     def __unicode__(self):
         return u'%s' % (self.token,)
@@ -99,6 +99,7 @@ class UserProfile(models.Model):
     name = models.CharField(max_length=100)
     contact_number = models.CharField(max_length=20)
     user = models.OneToOneField(User, related_name='profile')
+    dentist = models.ForeignKey(User, related_name='patient')
     device_token = models.ManyToManyField(DeviceToken, **optional)
 
     def __unicode__(self):
@@ -165,11 +166,11 @@ class EmergencySchedule(models.Model):
     def save(self, *args, **kwargs):
         super(EmergencySchedule, self).save(*args, **kwargs)
         if not self.is_booked:
-            if self.dentist.dentistdetail.device_token:
+            if self.dentist.dentistprofile.device_token:
                 apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
-                token_hex = self.dentist.dentistdetail.device_token
+                token_hex = self.dentist.dentistprofile.device_token.all()[0].token
                 alert_message = 'New appointment schedule for Dr. Elbaz is available  at %s - %s.' % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
                 payload = Payload(alert=alert_message, sound="default", badge=1)
 
@@ -177,9 +178,9 @@ class EmergencySchedule(models.Model):
                 identifier = 1
                 expiry = time.time()+3600
                 priority = 10
-                for device_token in DeviceToken.objects.all():
-                    frame.add_item(device_token.token, payload, identifier, expiry, priority)
-                    notification = Notification(message=alert_message, device_token=device_token.token)
+                for patient in UserProfile.objects.filter(dentist=self.dentist):
+                    frame.add_item(patient.device_token.all()[0].token, payload, identifier, expiry, priority)
+                    notification = Notification(message=alert_message, user=patient)
                     notification.save()
                 apns.gateway_server.send_notification_multiple(frame)
 
@@ -223,28 +224,28 @@ class Appointment(models.Model):
     def save(self, *args, **kwargs):
         super(Appointment, self).save(*args, **kwargs)
         if self.status == 'pending':
-            if self.dentist.dentistdetail.device_token:
+            if self.dentist.dentistprofile.device_token:
                 apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
-                token_hex = self.dentist.dentistdetail.device_token
+                token_hex = self.dentist.dentistprofile.device_token.all()[0].token
                 alert_message = self.patient.profile.name + ' requested for an appointment on %s - %s.'  % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
-                notification = Notification(message=alert_message, device_token=token_hex)
+                notification = Notification(message=alert_message, user=self.dentist)
                 notification.save()
                 payload = Payload(alert=alert_message, sound="default", badge=1)
                 apns.gateway_server.send_notification(token_hex, payload)
         else:
-            if self.device_token:
+            if self.status != 'pending':
                 apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
-                token_hex = self.device_token
+                token_hex = self.device_token.all()[0].token
                 if self.status == 'declined':
                     alert_message = 'Your appointment request has been declined. Please contact us for further details.'
                 elif self.status == 'accepted':
                     alert_message = 'Your appointment request has been accepted. Please visit us on %s - %s.' % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
                 payload = Payload(alert=alert_message, sound="default", badge=1)
-                notification = Notification(message=alert_message, device_token=token_hex)
+                notification = Notification(message=alert_message, user=self.patient)
                 notification.save()
                 apns.gateway_server.send_notification(token_hex, payload)
 

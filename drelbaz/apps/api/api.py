@@ -127,11 +127,18 @@ class UserResource(ModelResource):
             if user.is_active:
                 login(request, user)
                 client_id, client_secret = retrieve_oauth_client(user)
+                try:
+                    profile = user.profile
+                    type = 'patient'
+                except UserProfile.DoesNotExist:
+                    profile = user.dentistprofile
+                    type = 'dentist'
+
                 return self.create_response(request, {
                     'success': True,
                     'client_id': client_id,
                     'client_secret': client_secret,
-                    'type': user.profile.type,
+                    'type': type,
                     'user_url': '/api/v1/user/%d/' % (user.id,),
                 })
             else:
@@ -156,6 +163,8 @@ class UserResource(ModelResource):
 
 class UserCreateResource(ModelResource):
     user = fields.ForeignKey('api.api.UserResource', 'user', full=True)
+    dentist = fields.ForeignKey('api.api.UserResource', 'dentist', full=True)
+    device_token = fields.ManyToManyField('api.api.DeviceTokenResource', 'device_token', full=True)
 
     class Meta:
         allowed_methods = ['post']
@@ -170,7 +179,7 @@ class UserCreateResource(ModelResource):
         return object_list.filter(id=bundle.request.user.id).select_related()
 
     def hydrate(self, bundle):
-        REQUIRED_USER_PROFILE_FIELDS = ('name', 'user', 'contact_number',)
+        REQUIRED_USER_PROFILE_FIELDS = ('name', 'user', 'contact_number', 'dentist',)
         for field in REQUIRED_USER_PROFILE_FIELDS:
             if bundle.data.get(field) == "":
                 raise CustomBadRequest(
@@ -213,6 +222,7 @@ class UserCreateResource(ModelResource):
 
 class UserProfileResource(ModelResource):
     user = fields.ForeignKey(UserResource, 'user', full=True)
+    dentist = fields.ForeignKey(UserResource, 'dentist', full=True)
 
     class Meta:
         authentication = OAuth20Authentication()
@@ -266,7 +276,7 @@ class BookResource(ModelResource):
 
 
 class PhotoResource(ModelResource):
-    user = fields.ForeignKey(UserResource, 'user')
+    dentist = fields.ForeignKey(UserResource, 'dentist')
 
     class Meta:
         queryset = Photo.objects.all()
@@ -280,11 +290,11 @@ class PhotoResource(ModelResource):
 
 
 class DentistProfileResource(ModelResource):
-    user = fields.ToOneField(UserResource, 'user')
+    dentist = fields.ToOneField(UserResource, 'dentist')
 
     class Meta:
         queryset = DentistProfile.objects.all()
-        resource_name = 'dentist_profile'
+        resource_name = 'dentistprofile'
         allowed_methods = ['get', 'post', 'patch', 'put',]
         authentication = OAuth20Authentication()
         authorization = Authorization()
@@ -300,6 +310,7 @@ class DentistProfileResource(ModelResource):
 
 class AppointmentResource(ModelResource):
     dentist = fields.ForeignKey(UserResource, 'dentist')
+    patient = fields.ForeignKey(UserResource, 'patient')
 
     class Meta:
         queryset = Appointment.objects.all()
