@@ -574,3 +574,7 @@ footer {
     width: 65px;
     height: 65px;
 }
+
+.paypal-button button.large {
+    font-size: 35px !important;
+}

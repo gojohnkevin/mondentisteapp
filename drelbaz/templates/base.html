@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 
     <head>
@@ -81,21 +80,25 @@
                             <div class="description">
                                 Alors que l’émergence des nouvelles technologies de l’information et de la  communication est aujourd'hui à son apogée, la commucation patient  Chirurgien dentiste reste marginale. L’équipe de Mon Dentiste App, composée d’Ingenieurs informatiques et de professionels de la santé a imaginé pour vous une application efficace.  Notre volonté est de connecter les dentistes et les patients via leur téléphone mobile.
                             </div>
+
                             <div class="top-button">
-                                <a class="button-1" href="#">
-                                    <span class="button-1-left"><i class="fa fa-mobile"></i></span>
-                                    <span class="button-1-right">
-                                        <span class="button-1-right-top">Available on the</span>
-                                        <span class="button-1-right-bottom">App Store</span>
-                                    </span>
-                                </a>
-                                <a class="button-2" href="#">
-                                    <span class="button-2-left"><i class="fa fa-android"></i></span>
-                                    <span class="button-2-right">
-                                        <span class="button-2-right-top">Get it now for</span>
-                                        <span class="button-2-right-bottom">Android</span>
-                                    </span>
-                                </a>
+<!--                                 <a class="button-1" href="#">
+    <span class="button-1-left"><i class="fa fa-mobile"></i></span>
+    <span class="button-1-right">
+        <span class="button-1-right-top">Available on the</span>
+        <span class="button-1-right-bottom">App Store</span>
+    </span>
+</a> -->
+                                <script async="async" src="https://www.paypalobjects.com/js/external/paypal-button.min.js?merchant=vrieni.arguelles@gmail.com" 
+                                    data-button="buynow" 
+                                    data-name="Mondentiste iOS App" 
+                                    data-amount="200" 
+                                    data-shipping="0" 
+                                    data-tax="0" 
+                                    data-callback="http://www.mondentisteapp.com/" 
+                                    data-env="sandbox"
+                                ></script>
+
                             </div>
                         </div>
                     </div>
@@ -405,59 +408,6 @@
             </div>
         </div>
         
-        <!-- About us -->
-        <div class="about-us-container section-container">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-12 about-us section-description wow fadeIn">
-                        <h2>About our team</h2>
-                        <p>
-                            Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut 
-                            aliquip ex ea commodo consequat. Ut wisi enim ad minim veniam, quis nostrud.
-                        </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 about-us-box wow fadeInUp">
-                        <div class="about-us-photo">
-                            <img src="{{STATIC_URL}}img/team/1.jpg" alt="" data-at2x="{{STATIC_URL}}img/team/1.jpg">
-                        </div>
-                        <h3>John Doe</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</p>
-                        <div class="about-us-social">
-                            <a class="ultm ultm-facebook ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                            <a class="ultm ultm-dribbble ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                            <a class="ultm ultm-twitter ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 about-us-box wow fadeInDown">
-                        <div class="about-us-photo">
-                            <img src="{{STATIC_URL}}img/team/2.jpg" alt="" data-at2x="{{STATIC_URL}}img/team/2.jpg">
-                        </div>
-                        <h3>Tim Brown</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</p>
-                        <div class="about-us-social">
-                            <a class="ultm ultm-facebook ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                            <a class="ultm ultm-dribbble ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                            <a class="ultm ultm-twitter ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 about-us-box wow fadeInUp">
-                        <div class="about-us-photo">
-                            <img src="{{STATIC_URL}}img/team/3.jpg" alt="" data-at2x="{{STATIC_URL}}img/team/3.jpg">
-                        </div>
-                        <h3>Sarah Red</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</p>
-                        <div class="about-us-social">
-                            <a class="ultm ultm-facebook ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                            <a class="ultm ultm-dribbble ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                            <a class="ultm ultm-twitter ultm-32 ultm-square ultm-color-to-gray" href=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Latest tweets -->
 <!--         <div class="latest-tweets-container section-container section-container-full-bg">
     <div class="container">
@@ -560,6 +510,7 @@
         <script type="text/javascript">
 
             var bounds = new google.maps.LatLngBounds();
+            var clinics = {{ clinics|safe }};
 
             function initialize() {
                 var mapOptions = {
@@ -567,35 +518,23 @@
                   zoom: 8,
                   scrollwheel: false
                 };
+
                 var map = new google.maps.Map(document.getElementById('map-canvas'),
                     mapOptions);
 
-                var myLatlng1 = new google.maps.LatLng(48.870962, 2.277893);
-                var marker1 = new google.maps.Marker({
-                    position: myLatlng1,
-                    map: map,
-                    title: 'Dr. Kevin Go',
-                    icon: 'static/img/drop-pin1.png',
-                });
-                bounds.extend(marker1.position);
+                console.log(clinics);
 
-                var myLatlng2 = new google.maps.LatLng(48.877002, 2.303771);
-                var marker2 = new google.maps.Marker({
-                    position: myLatlng2,
-                    map: map,
-                    title: 'Dr. Jack Elbaz',
-                    icon: 'static/img/drop-pin1.png',
+                $.each(clinics, function(index, value){
+                    var latlng = new google.maps.LatLng(value.latitude, value.longitude);
+                    var marker = new google.maps.Marker({
+                        position: latlng,
+                        map: map,
+                        title: value.dentist,
+                        icon: 'static/img/drop-pin1.png',
+                    });
+                    bounds.extend(marker.position);
                 });
-                bounds.extend(marker2.position);
 
-                var myLatlng3 = new google.maps.LatLng(48.863678, 2.296904);
-                var marker3 = new google.maps.Marker({
-                    position: myLatlng3,
-                    map: map,
-                    title: 'Dr. Philip Arguelles',
-                    icon: 'static/img/drop-pin1.png',
-                });
-                bounds.extend(marker3.position);
                 map.fitBounds(bounds);
             }
 

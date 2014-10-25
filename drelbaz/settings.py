@@ -38,19 +38,47 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'south',
     'tastypie',
+    # 'billing',
+    # 'cms',  # django CMS itself
+    'mptt',  # utilities for implementing a modified pre-order traversal tree
+    # 'menus',  # helper for model independent hierarchical website navigation
+    'south',  # intelligent schema and data migrations
+    # 'sekizai',  # for javascript and css management
+    # 'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
+    'django_comments',
+    'tagging',
+    'zinnia',
     #local
     'accounts',
     'api',
+    'misc',
 )
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.doc.XViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.middleware.language.LanguageCookieMiddleware',
 )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.request',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'zinnia.context_processors.version',  # Optional
+)
+
 
 ROOT_URLCONF = 'drelbaz.urls'
 
@@ -61,15 +89,34 @@ WSGI_APPLICATION = 'drelbaz.wsgi.application'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+LANGUAGES = (
+    ('en-us', u'English (US)'),
+    ('de', u'Deutsch'),
+    ('en-gb', u'English (UK)'),
+)
+
+CMS_LANGUAGES = LANGUAGES
+
+CMS_LANGUAGE_CONF = {
+    'de': ['en-gb', 'en-us', 'fr', 'es', 'pt'],
+    'en-gb': ['en-us', 'fr', 'es', 'de', 'pt'],
+    'en-us': ['en-gb', 'fr', 'es', 'de', 'pt'],
+}
+
+CMS_HIDE_UNTRANSLATED = False
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 SITE_ID = 1
+
+### Django Merchant
+MERCHANT_TEST_MODE = False
+PAYPAL_TEST = MERCHANT_TEST_MODE
+
 
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
@@ -104,6 +151,13 @@ MEDIA_URL = '/media/'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'drelbaz', 'templates'),
+    os.path.join(BASE_DIR, 'drelbaz', 'templates', 'zinnia'),
+    os.path.join(BASE_DIR, 'templates'),
+)
+
+CMS_TEMPLATES = (
+    ('template_1.html', 'Template One'),
+    ('template_2.html', 'Template Two'),
 )
 
 API_LIMIT_PER_PAGE = 0
@@ -111,6 +165,7 @@ TASTYPIE_DEFAULT_FORMATS = ['json']
 
 APN_CERT_LOCATION = os.path.join(BASE_DIR, 'drelbaz/certs/PushNotifsCert.pem')
 APN_KEY_LOCATION = os.path.join(BASE_DIR, 'drelbaz/certs/NewPushNotifsKey.pem')
+
 
 
 try:

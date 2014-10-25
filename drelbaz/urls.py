@@ -12,6 +12,8 @@ urlpatterns = patterns('',
     url(r'^api/', include('api.urls')),
 
     url(r'^oauth2/', include('provider.oauth2.urls', namespace = 'oauth2')),
+    url(r'^weblog/', include('zinnia.urls', namespace='zinnia')),
+    url(r'^comments/', include('django_comments.urls')),
 )
 
 if settings.DEBUG:
