@@ -180,7 +180,7 @@ class EmergencySchedule(models.Model):
                 priority = 10
                 for patient in UserProfile.objects.filter(dentist=self.dentist):
                     frame.add_item(patient.device_token.all()[0].token, payload, identifier, expiry, priority)
-                    notification = Notification(message=alert_message, user=patient)
+                    notification = Notification(message=alert_message, user=patient.user)
                     notification.save()
                 apns.gateway_server.send_notification_multiple(frame)
 
@@ -239,7 +239,7 @@ class Appointment(models.Model):
                 apns = APNs(use_sandbox=False, cert_file=settings.APN_CERT_LOCATION, key_file=settings.APN_KEY_LOCATION)
 
                 # Send a notification
-                token_hex = self.device_token.all()[0].token
+                token_hex = self.patient.profile.device_token.all()[0].token
                 if self.status == 'declined':
                     alert_message = 'Your appointment request has been declined. Please contact us for further details.'
                 elif self.status == 'accepted':
