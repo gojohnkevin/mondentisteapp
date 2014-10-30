@@ -13,6 +13,7 @@ from accounts.models import (
     Notification,
     Book,
     UserProfile,
+    Note,
 )
 
 
@@ -48,3 +49,4 @@ admin.site.register(EmergencySchedule, EmergencyScheduleAdmin)
 admin.site.register(Notification)
 admin.site.register(Book)
 admin.site.register(UserProfile)
+admin.site.register(Note)

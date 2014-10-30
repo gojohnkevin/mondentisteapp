@@ -10,6 +10,7 @@ from accounts.models import (
     Appointment,
     DentistProfile,
     EmergencySchedule,
+    Note,
 )
 from drelbaz.libs.utils import get_or_none
 
@@ -71,3 +72,7 @@ class DeviceTokenForm(forms.ModelForm):
 class EmergencyScheduleForm(forms.ModelForm):
     class Meta:
         model = EmergencySchedule
+
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note

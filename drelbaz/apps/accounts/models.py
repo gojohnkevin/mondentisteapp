@@ -171,7 +171,7 @@ class EmergencySchedule(models.Model):
 
                 # Send a notification
                 token_hex = self.dentist.dentistprofile.device_token.all()[0].token
-                alert_message = 'New appointment schedule for Dr. Elbaz is available  at %s - %s.' % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
+                alert_message = 'Un RDV est disponible le %s a %s.' % (self.date.strftime('%b %d,%Y'), self.time.strftime('%H:%M'))
                 payload = Payload(alert=alert_message, sound="default", badge=1)
 
                 frame = Frame()
@@ -202,6 +202,11 @@ class Appointment(models.Model):
         (u'Devis prothèse', 'Devis prothèse'),
         (u'Devis implants', 'Devis implants'),
         (u'Autres', 'Autres'),
+        (u'Abcès', 'Abcès'),
+        (u'Fracture Dentaire', 'Fracture Dentaire'),
+        (u'Fracture osseuse', 'Fracture osseuse'),
+        (u'Urgence Esthétique', 'Urgence Esthétique'),
+        (u'Accident de dents de Sagesse', 'Accident de dents de Sagesse'),
     )
 
     #user fields
@@ -210,6 +215,8 @@ class Appointment(models.Model):
     purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
     comment = models.TextField(**optional)
     created = models.DateTimeField(auto_now_add=True)
+
+    emergency = models.ForeignKey(EmergencySchedule, **optional)
 
     dentist = models.ForeignKey(User, related_name='dentist_apts')
     patient = models.ForeignKey(User, related_name='patient_apts')
@@ -229,7 +236,7 @@ class Appointment(models.Model):
 
                 # Send a notification
                 token_hex = self.dentist.dentistprofile.device_token.all()[0].token
-                alert_message = self.patient.profile.name + ' requested for an appointment on %s - %s.'  % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
+                alert_message = self.patient.profile.name + ' requested for an appointment on %s - %s.'  % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%H:%M')))
                 notification = Notification(message=alert_message, user=self.dentist)
                 notification.save()
                 payload = Payload(alert=alert_message, sound="default", badge=1)
@@ -243,7 +250,7 @@ class Appointment(models.Model):
                 if self.status == 'declined':
                     alert_message = 'Your appointment request has been declined. Please contact us for further details.'
                 elif self.status == 'accepted':
-                    alert_message = 'Your appointment request has been accepted. Please visit us on %s - %s.' % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%I:%M %p')))
+                    alert_message = 'Your appointment request has been accepted. Please visit us on %s - %s.' % (self.date.strftime('%b %d,%Y'), (self.time.strftime('%H:%M')))
                 payload = Payload(alert=alert_message, sound="default", badge=1)
                 notification = Notification(message=alert_message, user=self.patient)
                 notification.save()

@@ -12,6 +12,7 @@ from .api import (
     BookResource,
     UserCreateResource,
     UserProfileResource,
+    NoteResource,
 )
 
 v1_api = Api(api_name='v1')
@@ -25,6 +26,7 @@ v1_api.register(NotificationResource())
 v1_api.register(BookResource())
 v1_api.register(UserCreateResource())
 v1_api.register(UserProfileResource())
+v1_api.register(NoteResource())
 
 urlpatterns = patterns('',
     (r'^', include(v1_api.urls)),

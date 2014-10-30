@@ -40,6 +40,7 @@ from accounts.forms import (
     DentistProfileForm,
     DeviceTokenForm,
     EmergencyScheduleForm,
+    NoteForm,
 )
 from accounts.models import (
     DeviceToken,
@@ -50,12 +51,35 @@ from accounts.models import (
     Notification,
     Book,
     UserProfile,
+    Note,
 )
 
 optional = {
     'null' : True,
     'blank': True,
 }
+
+class MultipartResource(object):
+    def deserialize(self, request, data, format=None):
+        if not format:
+            format = request.META.get('CONTENT_TYPE', 'application/json')
+
+        if format == 'application/x-www-form-urlencoded':
+            return request.POST
+
+        if format.startswith('multipart'):
+            data = request.POST.copy()
+            data.update(request.FILES)
+            return data
+
+        return super(MultipartResource, self).deserialize(request, data, format)
+
+    def put_detail(self, request, **kwargs):
+        if request.META.get('CONTENT_TYPE').startswith('multipart') and \
+                not hasattr(request, '_body'):
+            request._body = ''
+
+        return super(MultipartResource, self).put_detail(request, **kwargs)
 
 
 class UserResource(ModelResource):
@@ -252,6 +276,8 @@ class DeviceTokenResource(ModelResource):
 
 
 class NotificationResource(ModelResource):
+    user = fields.ForeignKey(UserResource, 'user')
+
     class Meta:
         queryset = Notification.objects.all()
         resource_name = 'notification'
@@ -308,27 +334,6 @@ class DentistProfileResource(ModelResource):
                                             resource=DentistProfileResource)
 
 
-class AppointmentResource(ModelResource):
-    dentist = fields.ForeignKey(UserResource, 'dentist')
-    patient = fields.ForeignKey(UserResource, 'patient')
-
-    class Meta:
-        queryset = Appointment.objects.all()
-        resource_name = 'appointment'
-        allowed_methods = ['get', 'post',]
-        authentication = OAuth20Authentication()
-        authorization = Authorization()
-        filtering = {
-            'patient': ALL_WITH_RELATIONS,
-            'dentist': ALL_WITH_RELATIONS,
-        }
-
-        @property
-        def validation(self):
-            return ModelFormValidation(form_class=AppointmentForm, \
-                                            resource=AppointmentResource)
-
-
 class EmergencyScheduleResource(ModelResource):
     dentist = fields.ForeignKey(UserResource, 'dentist')
 
@@ -379,3 +384,43 @@ class EmergencyScheduleResource(ModelResource):
                 week_schedule.update({date.strftime('%B %d, %Y'): schedules_list})
 
         return self.create_response(request, {'objects': week_schedule })
+
+class AppointmentResource(ModelResource):
+    dentist = fields.ForeignKey(UserResource, 'dentist')
+    patient = fields.ForeignKey(UserResource, 'patient')
+    emergency = fields.ForeignKey(EmergencyScheduleResource, 'emergency', null=True)
+
+    class Meta:
+        queryset = Appointment.objects.all()
+        resource_name = 'appointment'
+        allowed_methods = ['get', 'post', 'patch',]
+        authentication = OAuth20Authentication()
+        authorization = Authorization()
+        filtering = {
+            'patient': ALL_WITH_RELATIONS,
+            'dentist': ALL_WITH_RELATIONS,
+        }
+
+        @property
+        def validation(self):
+            return ModelFormValidation(form_class=AppointmentForm, \
+                                            resource=AppointmentResource)
+
+class NoteResource(MultipartResource, ModelResource):
+    image = fields.FileField(attribute='image')
+    user = fields.ForeignKey(UserResource, 'user')
+
+    class Meta:
+        queryset = Note.objects.all()
+        resource_name = 'note'
+        allowed_methods = ['get', 'post',]
+        authentication = OAuth20Authentication()
+        authorization = Authorization()
+        filtering = {
+            'user': ALL_WITH_RELATIONS,
+        }
+
+        @property
+        def validation(self):
+            return ModelFormValidation(form_class=NoteForm, \
+                                        resource=NoteResource)
